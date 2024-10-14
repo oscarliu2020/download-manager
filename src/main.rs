@@ -27,7 +27,7 @@ async fn main() {
     let targets=cmd.get_targets();
     let mut items=vec![];
     for target in targets {
-        println!("Downloading: {}",target);
+        println!("Detecting: {}",target);
         let res=Item::new(target).await;
         match res {
             Ok(item) => {
@@ -38,6 +38,7 @@ async fn main() {
             }
         }
     }
+    println!("Start downloading...");
     let client=ClientBuilder::new().build().unwrap();
     let tracker=TaskTracker::new();
     let mp=MultiProgress::new();

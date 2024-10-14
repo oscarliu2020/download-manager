@@ -47,12 +47,16 @@ impl Item {
                 bail!("[Size Is Zero] Url: {source}");
             }
             let backend:FileBackend  = if size>(2<<30) { // 2GB
-                let fs= tokio::fs::File::create(filename).await?;
+                let fs= tokio::fs::OpenOptions::new()
+                .create(true)
+                .write(true)
+                .read(true)
+                .open(filename).await.with_context(||"file creation error")?;
                 fs.set_len(size).await?;
-                let mmap=unsafe {memmap2::MmapMut::map_mut(&fs)?};
+                let mmap=unsafe {memmap2::MmapMut::map_mut(&fs).with_context(||"mmap error")?};
                 FileBackend::Memory(mmap)
             } else {
-                let fs= tokio::fs::File::create(filename).await?;
+                let fs= tokio::fs::File::create(filename).await.with_context(||"file creation error")?;
                 FileBackend::File(fs)
             };
             Ok(Self {
@@ -78,7 +82,7 @@ impl Item {
             }
         };
         let permit=SEM.acquire().await.unwrap();
-        let mut response=client.get(&self.source).send().await?;
+        let mut response=client.get(&self.source).send().await.with_context(||"[Response Error]")?;
         while let Some(chunk)=response.chunk().await? {
             pg.inc(chunk.len() as u64);
             writer.write_all(&chunk).await?;
