@@ -1,0 +1,17 @@
+[package]
+name = "download-manager"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+anyhow = "1.0.86"
+bytes = "1.6.0"
+clap = { version = "4.5.7", features = ["derive"] }
+indicatif = "0.17.8"
+memmap2 = "0.9.5"
+reqwest = "0.12.5"
+tempfile = "3.10.1"
+tokio = { version = "1.38.0", features = ["full"] }
+tokio-util = { version = "0.7.11", features = ["full"] }
+tracing = "0.1.40"
+tracing-subscriber = "0.3.18"
